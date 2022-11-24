@@ -1,0 +1,90 @@
+<%- include('header')%>
+<!--  -->
+<div class="container border border-0 card mb-3" style="margin-top: 100px">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <div
+                class="img-fluid rounded-start"
+                style="
+                    height: 400px;
+                    background-image: url('/uploads/<%= card.image%>');
+                    background-position: center;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                "
+            >
+                <a
+                    class="fs-5 text-decoration-none d-flex align-items-center"
+                    href="/"
+                >
+                    <img height="20" src="/images/left-arrow.png" alt="" />Back
+                </a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <form
+                    action="/update/<%= card.id%>"
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+                    <input
+                        type="text"
+                        placeholder="Card Title"
+                        class="form-control mb-5 p-2 fs-3"
+                        name="title"
+                        value="<%= card.title %>"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Author Name"
+                        class="form-control mb-5 p-2 fs-3"
+                        name="author"
+                        value="<%= card.author%>"
+                    />
+                    <div class="d-flex justify-content-between">
+                        <input
+                            type="file"
+                            placeholder="Author Name"
+                            class="form-control mb-5 p-2 fs-3 w-75 uploadfile"
+                            name="gallery"
+                        />
+                        <img
+                            class="preview"
+                            height="100"
+                            src="/uploads/<%= card.image%>"
+                            alt=""
+                        />
+                    </div>
+
+                    <input
+                        type="hidden"
+                        value="<%= card.image%>"
+                        name="oldgallery"
+                    />
+
+                    <button class="btn btn-success p-3 fs-3">
+                        Update gallery
+                    </button>
+                    <a
+                        href="/delete/<%= card.id%>"
+                        class="btn btn-danger p-3 fs-3"
+                    >
+                        Delete gallery
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadFile = document.querySelector(".uploadfile");
+    const preview = document.querySelector(".preview");
+    uploadFile.addEventListener("change", function (e) {
+        preview.src = URL.createObjectURL(e.target.files[0]);
+    });
+</script>
+
+<!--  -->
+<%- include('footer')%>

@@ -1,0 +1,47 @@
+<%- include('header')%>
+<!--  -->
+<%- include('nav')%>
+
+<div class="d-flex w-100 container flex-wrap">
+    <% if(cards.length === 0){ %>
+    <h3 class="m-auto text-danger mt-5">GALLERY IS EMPTY.</h3>
+    <% }%> <% cards.forEach(function(card){ %>
+
+    <div class="card mb-3 me-3" style="width: 18rem">
+        <div
+            class="card-img-top d-flex align-items-end"
+            style="
+                height: 400px;
+                background-image: url('/uploads/<%= card.image%>');
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+            "
+        >
+            <div
+                class="card-body w-100 d-flex justify-content-between align-items-center"
+            >
+                <div class="text-white">
+                    <h5 class="card-title">
+                        <a class="text-white" href="/update/<%= card.id%>">
+                            <%= card.title %>
+                        </a>
+                    </h5>
+                    <p class="card-text"><%= card.author%></p>
+                </div>
+
+                <a
+                    download="/uploads/<%= card.image%>"
+                    href="/uploads/<%= card.image%>"
+                    class="btn btn-light text-dark downloadbtn"
+                    ><img width="20" src="/images/download.png" alt=""
+                /></a>
+            </div>
+        </div>
+    </div>
+
+    <% })%>
+</div>
+
+<!--  -->
+<%- include('footer')%>
