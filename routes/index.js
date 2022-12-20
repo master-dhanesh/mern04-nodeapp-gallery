@@ -4,11 +4,16 @@ const upload = require("./multer");
 const uuid = require("uuid").v4;
 const fs = require("fs");
 const path = require("path");
+const Gallery = require("../model/galleryModel");
 
 let LOCAL_DB = [];
 
 router.get("/", function (req, res, next) {
-    res.render("show", { cards: LOCAL_DB });
+    Gallery.find()
+        .then((cards) => {
+            res.render("show", { cards });
+        })
+        .catch((err) => res.send(err));
 });
 
 router.get("/add", function (req, res, next) {
@@ -18,28 +23,29 @@ router.get("/add", function (req, res, next) {
 router.post("/add", function (req, res, next) {
     upload(req, res, function (err) {
         if (err) return res.send(err);
-        const newImage = {
-            id: uuid(),
+        Gallery.create({
             title: req.body.title,
             author: req.body.author,
             image: req.file.filename,
-        };
-        LOCAL_DB.push(newImage);
-        res.redirect("/");
+        })
+            .then(() => {
+                res.redirect("/");
+            })
+            .catch((err) => res.send(err));
     });
 });
 
 router.get("/update/:id", function (req, res, next) {
-    const id = req.params.id;
-    const data = LOCAL_DB.filter((d) => d.id === id);
-    res.render("update", { card: data[0] });
+    Gallery.findById(req.params.id)
+        .then((card) => {
+            res.render("update", { card });
+        })
+        .catch((err) => res.send(err));
 });
 
 router.post("/update/:id", function (req, res, next) {
     upload(req, res, function (err) {
         if (err) return res.send(err);
-        const id = req.params.id;
-        const cardIndex = LOCAL_DB.findIndex((d) => d.id === id);
         const updatedData = {
             title: req.body.title,
             author: req.body.author,
@@ -56,27 +62,31 @@ router.post("/update/:id", function (req, res, next) {
             );
             updatedData.image = req.file.filename;
         }
-        LOCAL_DB[cardIndex] = { ...LOCAL_DB[cardIndex], ...updatedData };
-        res.redirect("/");
+
+        Gallery.findByIdAndUpdate(req.params.id, updatedData)
+            .then(() => {
+                res.redirect("/");
+            })
+            .catch((err) => re.send(err));
     });
 });
 
 router.get("/delete/:id", function (req, res, next) {
-    const id = req.params.id;
-    const cardIndex = LOCAL_DB.findIndex((d) => d.id === id);
-    fs.unlinkSync(
-        path.join(
-            __dirname,
-            "..",
-            "public",
-            "uploads",
-            LOCAL_DB[cardIndex].image
-        )
-    );
-    LOCAL_DB.splice(cardIndex, 1);
-    // const FileteredData = LOCAL_DB.filter((d) => d.id !== id);
-    // LOCAL_DB = FileteredData;
-    res.redirect("/");
+    Gallery.findByIdAndDelete(req.params.id)
+        .then((deletedData) => {
+            fs.unlinkSync(
+                path.join(
+                    __dirname,
+                    "..",
+                    "public",
+                    "uploads",
+                    deletedData.image
+                )
+            );
+
+            res.redirect("/");
+        })
+        .catch((err) => res.send(err));
 });
 
 module.exports = router;
